@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ML Muhandisligiga Xush Kelibsiz</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Reveal.js Core CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reset.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
+    
+    <!-- Highlight.js Theme -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/plugin/highlight/monokai.min.css">
+
+    <style>
+        /* === OLED DARK THEME & UI DESIGN === */
+        :root {
+            --bg-color: #000000; /* True Black */
+            --primary: #00E5FF;  /* Neon Cyan */
+            --secondary: #B026FF; /* Neon Purple */
+            --text-light: #FFFFFF;
+            --text-muted: #A0AAB5;
+            --glass-bg: rgba(20, 20, 20, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-light);
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .reveal {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-light);
+            background: rgb(255, 255, 255);;
+        }
+
+        /* Override Reveal Default Headings */
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+            font-family: 'Inter', sans-serif;
+            text-transform: none;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 20px;
+            color: var(--text-light);
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .text-glow {
+            text-shadow: 0 0 40px rgba(0, 229, 255, 0.4);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        /* Glassmorphic Cards (Darker for OLED) */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 12px 40px rgba(0, 229, 255, 0.15);
+        }
+
+        /* Grid Layouts */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+
+        .flex-center { display: flex; align-items: center; justify-content: center; height: 100%; gap: 40px;}
+        .flex-col { display: flex; flex-direction: column; gap: 15px; }
+
+        /* Typography sizing */
+        .reveal p, .reveal li { font-size: 1.6rem; line-height: 1.5; color: var(--text-muted); }
+        .reveal li { margin-bottom: 12px; }
+        .reveal .big-stat { font-size: 3.2rem; font-weight: 900; margin: 0; color: var(--text-light); text-shadow: 0 0 20px rgba(255,255,255,0.2); }
+        .reveal .stat-label { font-size: 1.1rem; color: var(--primary); text-transform: uppercase; font-weight: 600; letter-spacing: 1px;}
+
+        /* Interactive Canvas UI */
+        .demo-container {
+            background: #0A0A0A;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,1);
+        }
+        canvas {
+            background: #000000;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.1);
+        }
+
+        /* Controls */
+        .control-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-size: 1rem;
+        }
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 60%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px; width: 16px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 0 15px var(--primary);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            color: #000;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Inter';
+            font-weight: 800;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(176, 38, 255, 0.4); }
+
+        /* Progress Bars */
+        .bar-container { width: 100%; background: rgba(255,255,255,0.05); border-radius: 6px; overflow: hidden; height: 24px; margin-top: 5px; border: 1px solid rgba(255,255,255,0.1); }
+        .bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--secondary)); transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);}
+        .bar-label { display: flex; justify-content: space-between; font-size: 1.2rem; margin-top: 15px; color: #fff;}
+
+        /* Code Block override */
+        .reveal pre { width: 100%; margin: 0; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); border: 1px solid var(--glass-border); }
+        .reveal code { font-family: 'Fira Code', monospace; font-size: 1.4rem; padding: 25px; line-height: 1.4; background: #050505;}
+
+        /* Arrows for diagrams */
+        .arrow { font-size: 2rem; color: var(--primary); margin: 10px 0; }
+    </style>
+</head>
+<body>
+
+<div class="reveal"> 
+    <div class="slides">
+
+        <!-- SLIDE 1: TITLE -->
+        <section data-transition="fade">
+            <p class="subtitle" style="margin-bottom: 20px;">01-Dars</p>
+            <h1 class="text-glow" style="font-size: 4rem;"><span class="text-gradient">ML Muhandisligiga</span><br>Xush Kelibsiz</h1>
+            <h3 style="color: var(--text-muted); font-weight: 400; margin-top: 30px;">Noldan intellektual tizimlarni yaratishgacha bo'lgan yo'lingiz</h3>
+        </section>
+
+        <!-- SLIDE 2: WHY ML? -->
+        <section>
+            <h2 class="text-gradient">Nima uchun Machine Learning? Nima uchun hozir?</h2>
+            <div class="grid-2" style="margin-top: 40px;">
+                <div style="text-align: left; padding-right: 20px;">
+                    <p>Biz <strong>Dasturlashdan</strong> (inson aniq qoidalarni yozishidan) <strong>O'rganishga</strong> (kompyuter ma'lumotlardan qoidalarni o'zi topishiga) o'tmoqdamiz.</p>
+                    <p>Sun'iy Insontekt (AI) endi shunchaki tadqiqot emas; u zamonaviy biznes, tibbiyot va texnologiyalarning asosiy dvigatelidir.</p>
+                </div>
+                <div class="flex-col">
+                    <div class="glass-card">
+                        <p class="stat-label">AQShdagi O'rtacha Maosh</p>
+                        <p class="big-stat">$162,000<span style="font-size: 1.5rem; color: var(--text-muted);">/yiliga</span></p>
+                    </div>
+                    <div class="glass-card">
+                        <p class="stat-label">Ish O'rinlarining O'sishi (Kelgusi 5 yilda)</p>
+                        <p class="big-stat" style="color: #00FF88;">+ 40%</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: APPLICATIONS -->
+        <section>
+            <h2 class="text-gradient">Siz Aslida Nimalarni Yaratishingiz Mumkin?</h2>
+            <p>ML Muhandisi sifatida siz zamonaviy texnologiya mo'jizalarining "miyasi"ni qurasiz.</p>
+            <div class="grid-4" style="margin-top: 30px;">
+                <div class="glass-card flex-col" style="align-items: center; text-align: center;">
+                    <h3 style="margin:0; font-size: 1.6rem; color: var(--primary);">👁️ Kompyuter Ko'rishi (CV)</h3>
+                    <p style="font-size: 1.1rem; margin:0;">Yuzni aniqlash, o'zi boshqariladigan avtomobillar, tibbiy kasalliklarni aniqlash.</p>
+                </div>
+                <div class="glass-card flex-col" style="align-items: center; text-align: center;">
+                    <h3 style="margin:0; font-size: 1.6rem; color: var(--secondary);">💬 Tabiiy Til (NLP)</h3>
+                    <p style="font-size: 1.1rem; margin:0;">ChatGPT kabi botlar, real vaqtda tarjima, matn tahlili.</p>
+                </div>
+                <div class="glass-card flex-col" style="align-items: center; text-align: center;">
+                    <h3 style="margin:0; font-size: 1.6rem; color: var(--primary);">🤖 Avtonom Tizimlar</h3>
+                    <p style="font-size: 1.1rem; margin:0;">O'rmonlarni aylanib o'tuvchi dronlar, yurishni o'rganuvchi robotlar.</p>
+                </div>
+                <div class="glass-card flex-col" style="align-items: center; text-align: center;">
+                    <h3 style="margin:0; font-size: 1.6rem; color: var(--secondary);">📈 Bashorat Qiluvchi Tizimlar</h3>
+                    <p style="font-size: 1.1rem; margin:0;">TikTok/Netflix tavsiyalari, algoritmik birja savdolari.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: DEMO 1 - HOW IT LEARNS -->
+        <section>
+            <h2 style="font-size: 2.2rem;">ML Mantiqi: <span class="text-gradient">Optimizatsiya</span></h2>
+            <div class="grid-2" style="align-items: center;">
+                <div style="text-align: left; font-size: 1.2rem;">
+                    <p style="font-size: 1.3rem; color: var(--text-light);">Model ma'lumotlarga qanday moslashadi:</p>
+                    <ul style="font-size: 1.2rem;">
+                        <li><strong>Kiruvchi ma'lumotlar:</strong> Ko'k nuqtalar (tarixiy faktlar).</li>
+                        <li><strong>Model (Chiziq):</strong> Binafsha chiziq tendensiyani bashorat qilishga urinadi.</li>
+                        <li><strong>Xatolik:</strong> Chiziq nuqtalardan qanchalik uzoqligini o'lchaydi.</li>
+                        <li><strong>O'rganish:</strong> U xatoni kamaytirish uchun avtomatik ravishda o'zini to'g'rilaydi.</li>
+                    </ul>
+                    <p style="font-size: 1rem; color: var(--text-muted); margin-top: 20px;"><em>"Gradient tushish" (Gradient Descent) algoritmini ko'rish uchun "Qayta o'rnatish" tugmasini bosing.</em></p>
+                    <button class="btn" onclick="resetDemo1()">Qayta o'rnatish</button>
+                </div>
+                
+                <!-- Demo 1 Container -->
+                <div class="demo-container">
+                    <canvas id="canvasDemo1" width="400" height="300"></canvas>
+                    
+                    <div class="control-group">
+                        <label style="font-size: 0.9rem;">O'rganish Tezligi (Speed)</label>
+                        <input type="range" id="lrSlider" min="0.001" max="0.1" step="0.001" value="0.02">
+                    </div>
+                    <div class="control-group">
+                        <label style="font-size: 0.9rem;">Ma'lumotlar Shovqini (Noise)</label>
+                        <input type="range" id="noiseSlider" min="0.1" max="1.5" step="0.1" value="0.4" onchange="generatePoints()">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: PARADIGM SHIFT -->
+        <section>
+            <h2>Paradigma O'zgarishi</h2>
+            <div class="flex-center" style="margin-top: 50px;">
+                <!-- Traditional -->
+                <div class="glass-card" style="flex: 1; text-align: center;">
+                    <h3 style="color: var(--text-muted);">An'anaviy Dasturlash</h3>
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin: 15px 0;">Ma'lumotlar + Qoidalar</div>
+                    <div class="arrow">↓</div>
+                    <div style="background: rgba(0, 229, 255, 0.1); padding: 15px; border-radius: 8px; border: 1px solid var(--primary);">Javoblar</div>
+                    <p style="font-size: 1rem; margin-top: 15px;">Inson barcha qoidalarni qo'lda yozishi kerak.</p>
+                </div>
+                
+                <div style="font-size: 2rem; color: var(--text-muted);">VS</div>
+                
+                <!-- ML -->
+                <div class="glass-card" style="flex: 1; text-align: center; border-color: var(--secondary);">
+                    <h3 class="text-gradient">Mashinali O'qitish</h3>
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin: 15px 0;">Ma'lumotlar + Javoblar</div>
+                    <div class="arrow" style="color: var(--secondary);">↓</div>
+                    <div style="background: rgba(176, 38, 255, 0.1); padding: 15px; border-radius: 8px; border: 1px solid var(--secondary); font-weight: bold;">Qoidalar (Model)</div>
+                    <p style="font-size: 1rem; margin-top: 15px;">Mashina qonuniyatlarni o'zi aniqlaydi.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: DEMO 2 - CLASSIFICATION -->
+        <section>
+            <h2 style="font-size: 2.2rem;">Real Vaqtda Naqshlarni Aniqlash</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 30px;">Kompyuterlar tasvirlarni sonlar matritsasi sifatida ko'radi. Keling, shakllarni real vaqtda tasniflaymiz.</p>
+            <div class="grid-2">
+                <!-- Drawing Canvas -->
+                <div class="demo-container" style="text-align: center;">
+                    <p style="font-size: 1rem; margin-bottom: 10px; color: var(--text-muted);"><strong>Aylana (0)</strong>, <strong>Chiziq (1)</strong>, yoki <strong>Uchburchak</strong> chizing</p>
+                    <canvas id="canvasDemo2" width="280" height="280" style="cursor: crosshair; background: #000; border-radius: 8px; border: 2px solid rgba(255,255,255,0.1);"></canvas>
+                    <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: center;">
+                        <button class="btn" style="background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted);" onclick="clearCanvas2()">Tozalash</button>
+                        <button class="btn" onclick="classifyDrawing()">Tasniflash</button>
+                    </div>
+                </div>
+                
+                <!-- Output Probs -->
+                <div class="glass-card" style="display: flex; flex-direction: column; justify-content: center;">
+                    <h3 style="font-size: 1.5rem; margin-bottom: 20px;">Neyron Tarmog'i Natijasi</h3>
+                    
+                    <div class="bar-label"><span>Aylana / Nol (0)</span> <span id="val-circle">0%</span></div>
+                    <div class="bar-container"><div id="bar-circle" class="bar-fill"></div></div>
+                    
+                    <div class="bar-label"><span>To'g'ri Chiziq (1)</span> <span id="val-line">0%</span></div>
+                    <div class="bar-container"><div id="bar-line" class="bar-fill"></div></div>
+                    
+                    <div class="bar-label"><span>Uchburchak / Boshqa</span> <span id="val-triangle">0%</span></div>
+                    <div class="bar-container"><div id="bar-triangle" class="bar-fill"></div></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 7: CAREER -->
+        <section>
+            <h2 class="text-gradient">Karyera Yo'l Xaritasi</h2>
+            <div class="grid-4" style="margin-top: 40px; text-align: left;">
+                <div class="glass-card">
+                    <h4 style="color: var(--text-muted); font-size: 1.2rem;">01. Kichik ML Dasturchi</h4>
+                    <p style="font-size: 1.1rem; color: #fff;">Ma'lumotlarni tozalaydi, tayyor kutubxonalar yordamida asosiy modellarni o'qitadi.</p>
+                    <p style="color: #00FF88; font-weight: bold; margin-top: 10px;">$80k - $110k</p>
+                </div>
+                <div class="glass-card">
+                    <h4 style="color: var(--text-muted); font-size: 1.2rem;">02. ML Muhandis</h4>
+                    <p style="font-size: 1.1rem; color: #fff;">Shaxsiy arxitekturalarni quradi, modellarni ishlab chiqarishga (production) joriy etadi.</p>
+                    <p style="color: #00FF88; font-weight: bold; margin-top: 10px;">$120k - $160k</p>
+                </div>
+                <div class="glass-card">
+                    <h4 style="color: var(--text-muted); font-size: 1.2rem;">03. Katta AI Tadqiqotchisi</h4>
+                    <p style="font-size: 1.1rem; color: #fff;">Yangi algoritmlar va optimizatsiyalarni loyihalaydi, Katta Ma'lumotlar bilan ishlaydi.</p>
+                    <p style="color: #00FF88; font-weight: bold; margin-top: 10px;">$170k - $250k+</p>
+                </div>
+                <div class="glass-card" style="border-color: var(--secondary); box-shadow: 0 0 20px rgba(176, 38, 255, 0.2);">
+                    <h4 style="color: var(--secondary); font-size: 1.2rem;">04. ML Arxitektori</h4>
+                    <p style="font-size: 1.1rem; color: #fff;">Kompaniya miqyosida AI strategiyasi va infratuzilmasini boshqaradi.</p>
+                    <p style="color: #00FF88; font-weight: bold; margin-top: 10px;">$250k - $400k+</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: BLUEPRINT -->
+        <section>
+            <h2>12 Oylik <span class="text-gradient">O'zlashtirish Rejasi</span></h2>
+            <div class="glass-card" style="text-align: left; max-width: 800px; margin: 0 auto; padding: 40px;">
+                <ol style="font-size: 1.4rem; color: var(--text-light); padding-left: 20px;">
+                    <li style="margin-bottom: 20px;"><strong>Python Asoslari:</strong> Sun'iy intellektning universal tili.</li>
+                    <li style="margin-bottom: 20px;"><strong>Ma'lumotlarni Tahlil Qilish (Pandas/NumPy):</strong> Ma'lumotlar bazalarini boshqarishni o'rganish.</li>
+                    <li style="margin-bottom: 20px;"><strong>Asosiy ML (Scikit-Learn):</strong> Regressiya, Daraxtlar, Klasterlash.</li>
+                    <li style="margin-bottom: 20px;"><strong>Chuqur O'rganish (Deep Learning - PyTorch):</strong> Neyron tarmoqlar, CV, NLP.</li>
+                    <li><strong>Ishlab chiqarish (MLOps):</strong> API orqali modellarni real dunyoga tatbiq etish.</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- SLIDE 9: CODE SNIPPET -->
+        <section>
+            <h2 style="font-size: 2.2rem;">Bugungi Birinchi G'alabangiz</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 20px;">Zamonaviy kutubxonalar murakkab matematikani yashiradi. AIni o'qitish atigi 3 qator kodni oladi.</p>
+            
+            <div style="text-align: left;">
+                <pre><code class="language-python" data-trim>
+# 1. Miyani Tanlash (Modelni yaratish)
+from sklearn.linear_model import LinearRegression
+model = LinearRegression()
+
+# 2. Miyani O'qitish (Tarixiy ma'lumotlar va to'g'ri javoblardan o'rganish)
+model.fit(tarixiy_malumotlar, togri_javoblar)
+
+# 3. Kelajakni Bashorat Qilish (Unga yangi savol bering!)
+kelajak_bashorati = model.predict(yangi_korilmagan_malumotlar)
+                </code></pre>
+            </div>
+        </section>
+
+        <!-- SLIDE 10: CONCLUSION -->
+        <section>
+            <h1 class="text-glow" style="font-size: 3.5rem;">Kelajak kutilmaydi.</h1>
+            <h2 class="text-gradient" style="font-size: 2.5rem; margin-top: 10px;">U hisoblab chiqiladi va quriladi.</h2>
+            <p style="margin: 40px 0; font-size: 1.5rem; color: var(--text-light);">Oddiy dasturlardan foydalanishni to'xtatib, aqlli tizimlarni yaratishga tayyormisiz?</p>
+            
+            <div style="padding: 20px; border: 1px solid var(--glass-border); border-radius: 12px; display: inline-block; background: var(--glass-bg);">
+                <p style="margin: 0; font-weight: bold; color: var(--primary);">Savol va Javoblar</p>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<!-- Reveal.js Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/plugin/highlight/highlight.min.js"></script>
+
+<script>
+    // Initialize Reveal JS
+    Reveal.initialize({
+        hash: true,
+        transition: 'slide',
+        backgroundTransition: 'fade',
+        center: true,
+        plugins: [ RevealHighlight ]
+    });
+
+    /* =========================================
+       DEMO 1: GRADIENT DESCENT (HOW ML LEARNS)
+       ========================================= */
+    const canvas1 = document.getElementById('canvasDemo1');
+    const ctx1 = canvas1.getContext('2d');
+    
+    let dataPoints = [];
+    let model_m = -0.5; // Initial bad slope
+    let model_b = 0.8;  // Initial bad intercept
+    let animationId = null;
+
+    function mapX(x) { return x * canvas1.width; }
+    function mapY(y) { return canvas1.height - (y * canvas1.height); }
+
+    function generatePoints() {
+        dataPoints = [];
+        const true_m = 0.6;
+        const true_b = 0.2;
+        const noiseSlider = document.getElementById('noiseSlider');
+        const noiseLevel = parseFloat(noiseSlider.value);
+        
+        for(let i=0; i<40; i++) {
+            let x = Math.random();
+            let noise = (Math.random() - 0.5) * noiseLevel;
+            let y = (true_m * x) + true_b + noise;
+            
+            // Keep points roughly in bounds
+            if(y > 0.95) y = 0.95;
+            if(y < 0.05) y = 0.05;
+            
+            dataPoints.push({x, y});
+        }
+    }
+
+    function resetDemo1() {
+        model_m = -0.5 + Math.random();
+        model_b = 0.5 + Math.random()*0.5;
+        generatePoints();
+    }
+
+    function drawDemo1() {
+        ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
+        
+        // Draw grid
+        ctx1.strokeStyle = 'rgba(255,255,255,0.05)';
+        ctx1.lineWidth = 1;
+        for(let i=0; i<5; i++) {
+            ctx1.beginPath(); ctx1.moveTo(0, i*(canvas1.height/4)); ctx1.lineTo(canvas1.width, i*(canvas1.height/4)); ctx1.stroke();
+            ctx1.beginPath(); ctx1.moveTo(i*(canvas1.width/4), 0); ctx1.lineTo(i*(canvas1.width/4), canvas1.height); ctx1.stroke();
+        }
+
+        // Draw Data Points & Error Lines
+        for(let p of dataPoints) {
+            let pred_y = model_m * p.x + model_b;
+            
+            // Error Line (Red-ish)
+            ctx1.beginPath();
+            ctx1.strokeStyle = 'rgba(239, 68, 68, 0.6)';
+            ctx1.lineWidth = 1;
+            ctx1.moveTo(mapX(p.x), mapY(p.y));
+            ctx1.lineTo(mapX(p.x), mapY(pred_y));
+            ctx1.stroke();
+
+            // Point (Cyan)
+            ctx1.beginPath();
+            ctx1.fillStyle = '#00E5FF';
+            ctx1.arc(mapX(p.x), mapY(p.y), 4, 0, Math.PI*2);
+            ctx1.fill();
+        }
+
+        // Draw Model Line (Purple)
+        ctx1.beginPath();
+        ctx1.strokeStyle = '#B026FF';
+        ctx1.lineWidth = 4;
+        ctx1.lineCap = 'round';
+        ctx1.moveTo(mapX(0), mapY(model_b));
+        ctx1.lineTo(mapX(1), mapY(model_m * 1 + model_b));
+        ctx1.stroke();
+
+        // Perform one step of Gradient Descent
+        const lr = parseFloat(document.getElementById('lrSlider').value);
+        let dm = 0;
+        let db = 0;
+        let n = dataPoints.length;
+        
+        for(let p of dataPoints) {
+            let pred_y = model_m * p.x + model_b;
+            let error = pred_y - p.y;
+            dm += error * p.x;
+            db += error;
+        }
+        
+        // Update parameters
+        model_m -= lr * (dm / n) * 2;
+        model_b -= lr * (db / n) * 2;
+
+        animationId = requestAnimationFrame(drawDemo1);
+    }
+
+
+    /* =========================================
+       DEMO 2: LIVE DRAWING CLASSIFICATION
+       ========================================= */
+    const canvas2 = document.getElementById('canvasDemo2');
+    const ctx2 = canvas2.getContext('2d', {willReadFrequently: true});
+    let isDrawing = false;
+
+    // Fix for canvas scaling inside Reveal.js
+    function getMousePos(canvas, evt) {
+        var rect = canvas.getBoundingClientRect();
+        var scaleX = canvas.width / rect.width;
+        var scaleY = canvas.height / rect.height;
+        // Check for touch vs mouse
+        let clientX = evt.clientX || (evt.touches && evt.touches[0].clientX);
+        let clientY = evt.clientY || (evt.touches && evt.touches[0].clientY);
+        return {
+            x: (clientX - rect.left) * scaleX,
+            y: (clientY - rect.top) * scaleY
+        };
+    }
+
+    function startDrawing(e) {
+        e.preventDefault();
+        isDrawing = true;
+        let pos = getMousePos(canvas2, e);
+        ctx2.beginPath();
+        ctx2.moveTo(pos.x, pos.y);
+    }
+
+    function draw(e) {
+        if(!isDrawing) return;
+        e.preventDefault();
+        let pos = getMousePos(canvas2, e);
+        ctx2.lineTo(pos.x, pos.y);
+        ctx2.strokeStyle = '#00E5FF';
+        ctx2.lineWidth = 14;
+        ctx2.lineCap = 'round';
+        ctx2.lineJoin = 'round';
+        
+        // Add neon glow to stroke
+        ctx2.shadowBlur = 15;
+        ctx2.shadowColor = '#00E5FF';
+        
+        ctx2.stroke();
+    }
+
+    function stopDrawing() {
+        isDrawing = false;
+    }
+
+    // Mouse Events
+    canvas2.addEventListener('mousedown', startDrawing);
+    canvas2.addEventListener('mousemove', draw);
+    canvas2.addEventListener('mouseup', stopDrawing);
+    canvas2.addEventListener('mouseleave', stopDrawing);
+    
+    // Touch Events
+    canvas2.addEventListener('touchstart', startDrawing, {passive: false});
+    canvas2.addEventListener('touchmove', draw, {passive: false});
+    canvas2.addEventListener('touchend', stopDrawing);
+
+    function clearCanvas2() {
+        ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+        updateBars(0, 0, 0);
+    }
+
+    function classifyDrawing() {
+        // Simulated ML inference heuristic
+        let imageData = ctx2.getImageData(0,0,canvas2.width,canvas2.height);
+        let data = imageData.data;
+        
+        let minX = canvas2.width, maxX = 0;
+        let minY = canvas2.height, maxY = 0;
+        let pixelCount = 0;
+
+        // Find bounding box and pixel density
+        for (let y = 0; y < canvas2.height; y++) {
+            for (let x = 0; x < canvas2.width; x++) {
+                let alpha = data[(y * canvas2.width + x) * 4 + 3];
+                if (alpha > 0) {
+                    pixelCount++;
+                    if(x < minX) minX = x;
+                    if(x > maxX) maxX = x;
+                    if(y < minY) minY = y;
+                    if(y > maxY) maxY = y;
+                }
+            }
+        }
+
+        if (pixelCount < 50) {
+            updateBars(0, 0, 0);
+            return;
+        }
+
+        let width = maxX - minX;
+        let height = maxY - minY;
+        let ratio = width > 0 ? height / width : 0;
+        let area = width * height;
+        let density = area > 0 ? pixelCount / area : 0;
+
+        let pCircle = 0, pLine = 0, pTriangle = 0;
+
+        // Heuristics for the simulated model
+        if (ratio > 2.5 && density > 0.4) {
+            // Tall and thin = Line
+            pLine = 85 + Math.random()*10;
+            pCircle = Math.random()*10;
+            pTriangle = Math.random()*5;
+        } 
+        else if (ratio >= 0.7 && ratio <= 1.5 && density < 0.4 && pixelCount > 1500) {
+            // Roughly square bounds, low density interior = Circle
+            pCircle = 88 + Math.random()*8;
+            pLine = Math.random()*5;
+            pTriangle = Math.random()*7;
+        } 
+        else {
+            // Otherwise = Triangle / Complex
+            pTriangle = 82 + Math.random()*12;
+            pCircle = Math.random()*10;
+            pLine = Math.random()*8;
+        }
+
+        // Normalize to 100%
+        let total = pCircle + pLine + pTriangle;
+        updateBars(
+            Math.round((pCircle/total)*100), 
+            Math.round((pLine/total)*100), 
+            Math.round((pTriangle/total)*100)
+        );
+    }
+
+    function updateBars(circle, line, triangle) {
+        document.getElementById('bar-circle').style.width = circle + '%';
+        document.getElementById('val-circle').innerText = circle + '%';
+
+        document.getElementById('bar-line').style.width = line + '%';
+        document.getElementById('val-line').innerText = line + '%';
+
+        document.getElementById('bar-triangle').style.width = triangle + '%';
+        document.getElementById('val-triangle').innerText = triangle + '%';
+    }
+
+    // Startup Hooks
+    Reveal.on('ready', event => {
+        resetDemo1();
+        drawDemo1();
+    });
+
+</script>
+</body>
+</html>
